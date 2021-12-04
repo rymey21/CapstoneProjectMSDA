@@ -1,0 +1,143 @@
+---
+title: "MIS581 Capstone Project"
+author: "Ryan Meyers"
+date: "12/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## The EPA Dataset Transformations and Conversions
+
+The first step in the Capstone Project is to import the dataset that will be analyzed. This is completed by setting the working directory of the fileset and using the read.csv() function to read in the MPGManufacturer.csv file into the R Studio environment. The data is shown in summary formats with the head() and summary functions.
+
+```{r}
+setwd("C:\\Users\\Ryan\\Documents\\Grad School\\MIS581-CapstoneMSDA")
+
+library(dplyr)
+
+#Import Complete Dataset
+MPGManu.df <- read.csv("MPG_Manufacturer.csv")
+
+#Display First 6 Rows of dataset
+head(MPGManu.df)
+
+#Show Variable types in dataset and summary values
+summary(MPGManu.df)
+
+#Display converted variables and values
+summary(MPGManu.df)
+```
+
+## Filtering and Subsetting the Dataset for Analysis
+
+The EPA dataset is filtered into 3 main categories for All Vehicles, All Cars, and All Trucks. This dataset is then subsetting using the subset() function in the dplyr library to remove the categorical variables in the dataset that will not be used in the linear regression or ARIMA models. The main dataset that will be used for analysis will be the regdata2.df which contains information on all the vehicle types with the car and truck data subsets available to the organization for further analysis if desired using the same analysis methods.
+
+```{r}
+#Filter Dataset for the 3 main vehicle types of analysis
+MPGManuAll.df <- filter(MPGManu.df, MPGManu.df$Vehicle.Type == "All")
+MPGManuAll.df <- filter(MPGManuAll.df, MPGManuAll.df$Manufacturer == "All")
+MPGManuCar.df <- filter(MPGManu.df, MPGManu.df$Vehicle.Type == "All Car")
+MPGManuCar.df <- filter(MPGManuCar.df, MPGManuCar.df$Manufacturer == "All")
+MPGManuTruck.df <- filter(MPGManu.df, MPGManu.df$Vehicle.Type == "All Truck")
+MPGManuAllTruck.df <- filter(MPGManuTruck.df, MPGManuTruck.df$Manufacturer == "All")
+MPGManuAll.df
+
+#Subset Dataset to remove categorical variables from regression data
+regdata2.df <- MPGManuAll.df
+regdata2.df = subset(MPGManuAll.df, select = -c(Manufacturer, Regulatory.Class, Vehicle.Type))
+
+regdata2.df <- na.omit(regdata2.df)
+
+regdata2car.df = subset(MPGManuCar.df, select = -c(Manufacturer, Regulatory.Class, Vehicle.Type))
+regdata2car.df <- na.omit(regdata2car.df)
+
+regdata2truck.df = subset(MPGManuTruck.df, select = -c(Manufacturer, Regulatory.Class, Vehicle.Type))
+regdata2truck.df <- na.omit(regdata2truck.df)
+
+summary(regdata2.df)
+
+#coerse variables that are not numeric variable types but need to be using as.numeric function.
+
+regdata2.df$Real0World.CO2_City..g.mi.<-as.numeric(regdata2.df$Real0World.CO2_City..g.mi.)
+regdata2.df$ï..Model.Year<-as.numeric(regdata2.df$ï..Model.Year)
+
+regdata2car.df$Real0World.CO2_City..g.mi.<-as.numeric(regdata2car.df$Real0World.CO2_City..g.mi.)
+regdata2car.df$ï..Model.Year<-as.numeric(regdata2car.df$ï..Model.Year)
+
+regdata2truck.df$Real0World.CO2_City..g.mi.<-as.numeric(regdata2truck.df$Real0World.CO2_City..g.mi.)
+regdata2truck.df$ï..Model.Year<-as.numeric(regdata2truck.df$ï..Model.Year)
+
+summary(regdata2.df)
+```
+
+## The Linear Regression Model
+
+The lm() function is utilized to build the linear regression model for the real-world MPG variable for all vehicle types. The all vehicle type and all manufacturer type dataset is used for building the model. The residuals are plotted from the model displaying  a good fitting model. The results are shown from the model and predictions are created from the linear regression model. A gains chart is built to show the performance of the model with the accuracy of the model being displayed. The gains chart shows that the linear regression model outperforms a naive approach to predicting future values for the response variable.
+
+```{r}
+#Create Linear Regression Model
+
+linit2.reg <- lm(regdata2.df$Real0World.MPG ~ ., data = regdata2.df) 
+options(scipen=999)
+summary(linit2.reg)
+
+#Plot Residuals
+reg2.res = resid(linit2.reg)
+reg2.res
+plot(reg2.res, ylab = "Residual Values")
+abline(0,0)
+summary(reg2.res)
+
+#Add prediction values
+
+pred <- predict(linit2.reg, regdata2.df, type = "response") #create prediction values 
+
+#Plot Predictions and Model Years
+pred #display prediction values
+plot(regdata2.df$ï..Model.Year,pred,xlab = "Model Year", ylab = "Prediction Values")
+
+#plot gains chart for the Real World MPG Response Variable variable linear regression model
+library(gains)
+gain <- gains(as.numeric(regdata2.df$Real0World.MPG), pred)
+
+regdata2.df$Real0World.MPG <- as.numeric(as.character(regdata2.df$Real0World.MPG)) #convert RESPONSE variable for graphing
+
+plot(c(0,gain$cume.pct.of.total*sum(regdata2.df$Real0World.MPG))~
+       c(0,gain$cume.obs), 
+     xlab="# cases", ylab="Cumulative", main="", type="l")
+lines(c(0,sum(regdata2.df$Real0World.MPG))~c(0, dim(regdata2.df)[1]), lty=2)
+
+```
+
+## ARIMA Model
+
+An auto-regressive moving average model (ARIMA) is built utilizing the 'forecast' library in R. The same output variable of real-world MPG is used for the all vehicle and all manufacturers dataset. The results are graphed to display similar predictions to the linear regression model built in the previous section of the analysis.
+
+```{r}
+
+##ARIMA Model
+
+#install.packages('forecast', dependencies = TRUE)
+library(forecast)
+
+fit <- auto.arima(regdata2.df$Real0World.MPG)
+fit
+plot(forecast(fit, h=20))
+```
+
+## Electric Cars
+
+The future of electric cars and hybrid vehicles is increasing in the automobile market, therefore, graphical outputs were included to show the trend increase in the production values of these vehicle types.
+
+```{r}
+
+plot(regdata2.df$ï..Model.Year, regdata2.df$Powertrain.0.Electric.Vehicle..EV., type = "b", xlab = "Model Year", ylab ="Electric Car Percentage")
+
+plot(regdata2.df$ï..Model.Year, regdata2.df$Powertrain.0.Plug0in.Hybrid.Electric.Vehicle..PHEV., type = "b", xlab = "Model Year", ylab ="Plug In Hybrid Percentage")
+
+plot(regdata2.df$ï..Model.Year, regdata2.df$Powertrain.0.Gasoline.Hybrid, type = "b", xlab = "Model Year", ylab ="Gasoline Hybrid")
+
+```
