@@ -1,0 +1,24 @@
+﻿Element or value display name,Description,Data type,Character length,Required?,Accepts null value?
+Model Year,Year of Production for Automobile Class,Numeric,255,Yes,No
+Regulatory Class,Government Automobile Class,Text,255,Yes,No
+Vehicle Type,Designated Vehicle Type,Text,255,Yes,No
+Production Share,Production Share (as percent),Numeric,255,Yes,No
+Real-World MPG,Average miles per gallon combined,Numeric,255,Yes,No
+Real-World MPG_City,Average miles per gallon city,Numeric,255,Yes,No
+Real-World MPG_Hwy,Average miles per gallon highway,Numeric,255,Yes,No
+Real-World CO2 (g/mi),Average CO2 emissions combined,Numeric,255,Yes,No
+Real-World CO2_City (g/mi),Average CO2 emissions city,Numeric,255,Yes,No
+Real-World CO2_Hwy (g/mi),Average CO2 emissions highway,Numeric,255,Yes,No
+Weight (lbs),Average weight of vehicle class for model year,Numeric,255,Yes,No
+Horsepower (HP),Average horsepower of vehicle class for model year,Numeric,255,Yes,No
+Footprint (sq. ft.),Average footprint of vehicle class for model year,Numeric,255,Yes,No
+Transmission - Manual,Percent of manual transmissions for model year/vehicle class,Numeric,255,No,Yes
+Transmission - Automatic,Percent of automatic transmissions for model year/vehicle class,Numeric,255,No,Yes
+Transmission - CVT (Hybrid),Percent of CVT transmissions for model year/vehicle class,Numeric,255,No,Yes
+Powertrain - Diesel,Percent of Diesel vehicles for model year/vehicle class,Numeric,255,No,Yes
+Powertrain - Electric,Percent of Electric vehicles for model year/vehicle class,Numeric,255,No,Yes
+Powertrain - Plug-in Hybrid,Percent of Plug-In Hyrbid vehicles for model year/vehicle class,Numeric,255,No,Yes
+Powertrain - Fuel Cell,Percent of Fuel Cell vehicles for model year/vehicle class,Numeric,255,No,Yes
+Powertrain Gasoline Hybrid,Percent of Gasoline Hybrid vehicles for model year/vehicle class,Numeric,255,No,Yes
+Powertrain - Gasoline,Percent of Gasoline vehicles for model year/vehicle class,Numeric,255,No,Yes
+Average Numeric of Gears,Average Numeric of gears in vehicle for model year/vehicle class,Numeric,255,Yes,No
